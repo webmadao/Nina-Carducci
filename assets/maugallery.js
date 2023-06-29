@@ -1,45 +1,37 @@
-(function($) {
-  $.fn.mauGallery = function(options) {
-    var options = $.extend($.fn.mauGallery.defaults, options);
-    var tagsCollection = [];
-    return this.each(function() {
-      $.fn.mauGallery.methods.createRowWrapper($(this));
-      if (options.lightBox) {
-        $.fn.mauGallery.methods.createLightBox(
-          $(this),
-          options.lightboxId,
-          options.navigation
-        );
-      }
-      $.fn.mauGallery.listeners(options);
+$.fn.mauGallery = function(options) {
+  const opts = $.extend($.fn.mauGallery.defaults, options);
+  const tagsCollection = [];
+  
+  $.fn.mauGallery.methods.createRowWrapper(this);
+  if (opts.lightBox) {
+    $.fn.mauGallery.methods.createLightBox(
+      this,
+      opts.lightboxId,
+      opts.navigation
+    );
+  }
+  $.fn.mauGallery.listeners(opts);
+  this.children(".gallery-item").each(function(index) {
+    $.fn.mauGallery.methods.responsiveImageItem($(this));
+    $.fn.mauGallery.methods.moveItemInRowWrapper($(this));
+    $.fn.mauGallery.methods.wrapItemInColumn($(this), opts.columns);
+    const theTag = $(this).data("gallery-tag");
+    if (opts.showTags && theTag && !tagsCollection.includes(theTag)) {
+      tagsCollection.push(theTag);
+    }
+  });
+  if (opts.showTags) {
+    $.fn.mauGallery.methods.showItemTags(
+      this,
+      opts.tagsPosition,
+      tagsCollection
+    );
+  }
+  this.fadeIn(500);
+  
+  return this;
+};
 
-      $(this)
-        .children(".gallery-item")
-        .each(function(index) {
-          $.fn.mauGallery.methods.responsiveImageItem($(this));
-          $.fn.mauGallery.methods.moveItemInRowWrapper($(this));
-          $.fn.mauGallery.methods.wrapItemInColumn($(this), options.columns);
-          var theTag = $(this).data("gallery-tag");
-          if (
-            options.showTags &&
-            theTag !== undefined &&
-            tagsCollection.indexOf(theTag) === -1
-          ) {
-            tagsCollection.push(theTag);
-          }
-        });
-
-      if (options.showTags) {
-        $.fn.mauGallery.methods.showItemTags(
-          $(this),
-          options.tagsPosition,
-          tagsCollection
-        );
-      }
-
-      $(this).fadeIn(500);
-    });
-  };
   $.fn.mauGallery.defaults = {
     columns: 3,
     lightBox: true,
@@ -260,4 +252,4 @@
       });
     }
   };
-})(jQuery);
+(jQuery);
